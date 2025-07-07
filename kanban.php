@@ -10,26 +10,26 @@
   <header>
     <h1>🐞 JiraLite</h1>
     <nav>
-      <a href="#">Dashboard</a>
-      <a href="#">Report Bug</a>
-      <a href="#">Logout</a>
+      <a href="dashboard.php">Dashboard</a>
+      <a href="report_bug.php">Report Bug</a>
+      <a href="logout.php">Logout</a>
     </nav>
   </header>
 
   <main>
   <section class="kanban">
     <div class="column" id="todo" ondragover="allowDrop(event)" ondrop="drop(event, 'todo')">
-      <h2>To Do</h2>
+      <h2 style="color:red;">To Do</h2>
       <div class="card" draggable="true" ondragstart="drag(event)" data-id="1">Bug: Login form not working</div>
     </div>
 
     <div class="column" id="in_progress" ondragover="allowDrop(event)" ondrop="drop(event, 'in_progress')">
-      <h2>In Progress</h2>
+      <h2 style="color:orange;">In Progress</h2>
       <div class="card" draggable="true" ondragstart="drag(event)" data-id="2">Bug: CSS not loading</div>
     </div>
 
     <div class="column" id="done" ondragover="allowDrop(event)" ondrop="drop(event, 'done')">
-      <h2>Done</h2>
+      <h2 style="color:green;">Done</h2>
       <div class="card" draggable="true" ondragstart="drag(event)" data-id="3">Bug: Footer fixed</div>
     </div>
   </section>
