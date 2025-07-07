@@ -1,0 +1,106 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+.html,
+body {
+    height: 100%;
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background-color: #f5f5f5;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+    height: 100vh;
+    /* Optional background */
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* .login-form{
+    padding-right: 10px;
+} */
+
+.card label {
+    display: flex;
+    margin-bottom: 0.5rem;
+    color: #007bff;
+}
+
+.card input {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid #bababa;
+    border-radius: 4px;    
+}
+.card select{
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid #bababa;
+    border-radius: 4px;    
+}
+.card input:focus-visible{
+    border: 2px solid #007bff;
+    outline: none;
+}
+.card select:focus-visible{
+    border: 2px solid #007bff;
+    outline: none;
+}
+
+.login-form div {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.card button {
+    margin-top: 1.2rem;
+    padding: 0.5rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.card button:hover {
+    background-color: #0056b3;
+    animation-duration: 500ms;
+    transition: ease-in-out;
+}
+
+.card a{
+    color: #007bff;
+    font-size: small;
+}
+.title{
+    text-align: center;
+    font-size: x-large;
+    padding: 1rem;
+    font-weight: 700;
+    color:#0056b3;
+}
+.links{
+    display: flex;
+    justify-content: space-between
+}
