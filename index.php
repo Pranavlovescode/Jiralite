@@ -6,7 +6,7 @@ $pdo = createConnection();
 
 $error = '';
 
-if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_token'])) {
+if ((!isset($_SESSION['user_id']) && isset($_COOKIE['remember_token']) )|| (isset($_SESSION['user_id']) && isset($_COOKIE['remember_token']))) {
     $token = $_COOKIE['remember_token'];
     $stmt = $pdo->prepare("SELECT * FROM users WHERE remember_token = ?");
     $stmt->execute([$token]);
