@@ -6,9 +6,26 @@ $pdo = createConnection();
 
 $error = '';
 
+if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_token'])) {
+    $token = $_COOKIE['remember_token'];
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE remember_token = ?");
+    $stmt->execute([$token]);
+    $user = $stmt->fetch();
+
+    if ($user) {
+        // Auto-login
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['name'] = $user['name'];
+        $_SESSION['role'] = $user['role'];
+        header("Location: dashboard.php");
+        exit;
+    }
+}
+
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
     $email = trim($_POST['email']);
     $pass = $_POST['password'];
+    $remember = $_POST['remember'];
     
     if(!$email || !$pass){
         $error = '❌ Email and password are required.';
@@ -24,6 +41,15 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
             $_SESSION['name']=$user['name'];
             $_SESSION['role']=$user['role'];
             $_SESSION['email']=$user['email'];
+
+            if(!empty($remember)){
+                $token = bin2hex(random_bytes(32));
+                $stmt = $pdo->prepare("UPDATE users SET remember_token = ? WHERE id = ?");
+                $stmt->execute([$token, $user['id']]);
+                // setting cookie
+                setcookie('remember_token', $token, time() + (86400 * 30), '/', '', false, true); // httponly = true
+            }
+
             header("Location: dashboard.php");
             exit;
         }else{
@@ -31,6 +57,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         }
     }
 }
+
+
 
 ?>
 
@@ -59,10 +87,18 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
                 <label for="pass">Password</label>
                 <input type="password" name="password" placeholder="********">
             </div>
-            <p class='links'>
-                <a href="forget_password.php" class='forget-password'>Forget Password ?</a>
-                <a href="signup.php" class='signup'>Signup</a>
-            </p>
+            <span class="links">
+                <a href="#" class="forget-password">Forget Password?</a>
+                <a href="signup.php" class="signup">Signup</a>
+            </span>
+
+            <div class="remember">
+                <label>
+                    <input type="checkbox" name="remember" value="1">
+                    <p>Remember Me</p>
+                </label>
+            </div>
+
             <button type="submit">Login</button>
         </form>
     </div>
