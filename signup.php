@@ -25,9 +25,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($stmt->fetch()) {
             $errors[] = "Email already registered.";
         } else {
-            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)");
-            $success = $stmt->execute([$name, $email, $hashedPassword, $role]);
+            try {
+              $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+              $stmt = $pdo->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)");
+              $success = $stmt->execute([$name, $email, $hashedPassword, $role]);
+            } catch (PDOException $e) {
+              $errors[] = "Error: " . $e->getMessage(); // show error message
+            }
 
             if (!$success) {
                 $errors[] = "Something went wrong. Please try again.";
@@ -44,6 +48,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <link rel="stylesheet" href="static/login.css" />
   <title>JiraLite Signup</title>
 </head>
+<style>
+  .errors{
+    background-color: #f8d7da;
+      color: #a94442;
+      border: 1px solid #a94442;
+  }
+  .success{
+      margin-top: 1rem;
+      padding: 1rem;
+      background-color: #e1f5e1;
+      color: green;
+      border: 1px solid green;
+      border-radius: 5px;
+  }
+</style>
 <body>
   <div class="card">
     <p class="title">Welcome to JiraLite</p>
