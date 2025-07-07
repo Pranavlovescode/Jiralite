@@ -1,6 +1,13 @@
 <?php
 session_start();
 require "includes/db.php";
+require 'includes/PHPMailer/PHPMailer.php';
+require 'includes/PHPMailer/SMTP.php';
+require 'includes/PHPMailer/Exception.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 $pdo = createConnection();
 
 if (!isset($_SESSION['name'])) {
@@ -30,6 +37,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $success = $stmt->execute([$title, $description, $priority, $status, $reporter, $assignee]);
         } catch (PDOException $e) {
             $error = "Error: " . $e->getMessage(); // show error message
+        }
+
+        // code for sending email to assignee
+        try {
+                $stmt_1 = $pdo->prepare("SELECT * FROM users WHERE id=?");
+                $stmt_1->execute([$assignee]);
+                $assigned_user = $stmt_1->fetch();
+                $assigned_user_email = $assigned_user['email'];
+                $devEmail=$assigned_user['email'];
+                $devName=$assigned_user['name'];
+                $assigned_by=$_SESSION['name'];
+
+                $mail = new PHPMailer(true);
+                $mail->isSMTP();
+
+                $mail->isSMTP();
+                $mail->Host = 'live.smtp.mailtrap.io';     
+                $mail->SMTPAuth = true;
+                $mail->Username = 'api'; 
+                $mail->Password = '0ec71dc97bc8f143d4f205251eb87f74';       
+                $mail->SMTPSecure = 'tls';
+                $mail->Port = 587;
+
+                // Sender & recipient
+                $mail->setFrom('jiralitebot@pranavtitambe.in', 'JiraLite Bot');
+                $mail->addAddress($devEmail, $devName);
+
+                // Email content
+                $mail->isHTML(true);
+                $mail->Subject = 'New Bug Assigned to You';
+                $mail->Body = "
+                    <h3>Hello $devName,</h3>
+                    <p>A new bug has been assigned to you by <strong>$assigned_by</strong>.</p>
+                    <p><strong>Title:</strong> $title</p>
+                    <p><strong>Description:</strong> $description</p>
+                    <p><strong>Severity:</strong> $priority</p>
+                    <p><strong>Status:</strong> $status</p>
+                    <br>
+                    <p>Please log in to JiraLite to manage the task.</p>
+                ";
+
+                $mail->send();
+                $success .= " Email sent to $devEmail.";
+        } catch (PDOException $e) {
+            $error = "Error: " . $e->getMessage();
         }
     } else {
         $error = "All fields are required.";
