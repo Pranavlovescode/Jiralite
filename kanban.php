@@ -1,3 +1,27 @@
+<?php
+session_start();
+require "includes/db.php";
+
+if (!isset($_SESSION['user_id'])) {
+  header("Location: index.php");
+  exit();
+}
+
+$pdo = createConnection();
+
+// Admins see all bugs, others only their assigned ones
+if ($_SESSION['role'] === 'admin' || $_SESSION['role']==='qa') {
+  $stmt = $pdo->query("SELECT * FROM bugs");
+} else {
+  $stmt = $pdo->prepare("SELECT * FROM bugs WHERE assignee_id = ?");
+  $stmt->execute([$_SESSION['user_id']]);
+}
+$bugs = $stmt->fetchAll();
+?>
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -19,22 +43,33 @@
 
   <main>
     <section class="kanban">
-      <div class="column" id="todo" ondragover="allowDrop(event)" ondrop="drop(event, 'todo')">
-        <h2 style="color:red;">To Do</h2>
-        <div class="card" draggable="true" ondragstart="drag(event)" data-id="1">Bug: Login form not working</div>
-      </div>
-
-      <div class="column" id="in_progress" ondragover="allowDrop(event)" ondrop="drop(event, 'in_progress')">
-        <h2 style="color:orange;">In Progress</h2>
-        <div class="card" draggable="true" ondragstart="drag(event)" data-id="2">Bug: CSS not loading</div>
-      </div>
-
-      <div class="column" id="done" ondragover="allowDrop(event)" ondrop="drop(event, 'done')">
-        <h2 style="color:green;">Done</h2>
-        <div class="card" draggable="true" ondragstart="drag(event)" data-id="3">Bug: Footer fixed</div>
-      </div>
+      <?php
+      $statuses = [
+        'todo' => 'To Do',
+        'in_progress' => 'In Progress',
+        'done' => 'Done'
+      ];
+      $colors = [
+        'todo' => 'red',
+        'in_progress' => 'orange',
+        'done' => 'green'
+      ];
+      foreach ($statuses as $statusKey => $statusLabel): ?>
+        <div class="column" id="<?= $statusKey ?>" ondragover="allowDrop(event)"
+          ondrop="drop(event, '<?= $statusKey ?>')">
+          <h2 style="color:<?= $colors[$statusKey] ?>;"><?= $statusLabel ?></h2>
+          <?php foreach ($bugs as $bug): ?>
+            <?php if ($bug['status'] === $statusKey): ?>
+              <div class="card" draggable="true" ondragstart="drag(event)" data-id="<?= $bug['id'] ?>">
+                <?= htmlspecialchars($bug['title']) ?>
+              </div>
+            <?php endif; ?>
+          <?php endforeach; ?>
+        </div>
+      <?php endforeach; ?>
     </section>
   </main>
+
 
   <script>
     let draggedCard = null;
