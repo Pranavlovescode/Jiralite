@@ -30,12 +30,19 @@ $username = $_SESSION['name'];
 
 ?>
 
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Dashboard | JiraLite</title>
   <link rel="stylesheet" href="static/dashboard.css">
+  <?php if ($_SESSION['role'] === 'admin'): ?>
+    <link rel="stylesheet" href="static/admin.css">
+  <?php endif; ?>
+
 </head>
 <body>
 
@@ -44,7 +51,46 @@ $username = $_SESSION['name'];
   <a href="logout.php" style="color: white; text-decoration: underline;">Logout</a>
 </header>
 
+
 <div class="container">
+
+    
+
+  <?php if ($_SESSION['role'] === 'admin'): ?>
+    <?php
+    // Create a new statement object for bugs
+    $bugStmt = $pdo->prepare("SELECT * FROM bugs WHERE assignee_id IS NULL");
+    $bugStmt->execute();
+    $unassigned_bugs = $bugStmt->fetchAll();
+
+    // Get all developers
+    $devStmt = $pdo->prepare("SELECT * FROM users WHERE role='developer'");
+    $devStmt->execute();
+    $devs = $devStmt->fetchAll();
+    ?>
+
+    <div class="admin-panel">
+      <h2>Unassigned Bugs</h2>
+      <form method="POST" action="assign_bug.php">
+        <?php foreach ($unassigned_bugs as $bug): ?>
+          <div class="bug-card">
+            <p><strong>Title:</strong> <?= htmlspecialchars($bug['title']) ?></p>
+            <p><strong>Description:</strong> <?= htmlspecialchars($bug['description']) ?></p>
+            <label>Assign to:
+              <select name="assignee[<?= $bug['id'] ?>]">
+                <option value="">-- Select Developer --</option>
+                <?php foreach ($devs as $dev): ?>
+                  <option value="<?= $dev['id'] ?>"><?= htmlspecialchars($dev['name']) ?></option>
+                <?php endforeach; ?>
+              </select>
+            </label>
+          </div>
+        <?php endforeach; ?>
+        <button type="submit" class="assign-btn">Assign Selected Bugs</button>
+      </form>
+    </div>
+  <?php endif; ?>
+
   <div style="display:flex; justify-content:space-between; align-items:center;">
     <h1>Project Dashboard</h1>
     <h2>Welcome, <?= htmlspecialchars($username) ?>!</h2>
@@ -66,7 +112,9 @@ $username = $_SESSION['name'];
 
   <div class="links">
     <a href="kanban.php">View Kanban Board</a>
-    <a href="report_bug.php">Report New Bug</a>
+    <?php if($_SESSION['role'] === 'qa' || $_SESSION['role'] === 'admin'): ?>
+      <a href="report_bug.php">Report New Bug</a>
+    <?php endif; ?>
   </div>
 
   <?php if (count($todo_bugs) > 0): ?>

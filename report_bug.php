@@ -15,9 +15,10 @@ if (!isset($_SESSION['name'])) {
     exit();
 }
 
-$statement = $pdo->prepare("SELECT * FROM users where role='developer'");
-$statement->execute();
-$devs = $statement->fetchAll();
+if ($_SESSION['role'] !== 'qa' && $_SESSION['role'] !== 'admin') {
+  header("Location: dashboard.php");
+  exit();
+}
 
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -26,63 +27,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $description = trim($_POST['description']);
     $priority = $_POST['severity'];
     $status = $_POST['status'];
-    $assignee = $_POST['assignee'];
+    // $assignee = $_POST['assignee'];
     $reporter = $_SESSION['user_id'];
 
     if ($title && $description) {
 
         try {
-            $stmt = $pdo->prepare("INSERT INTO bugs (title, description, priority, status, reporter_id, assignee_id)
-                                VALUES (?, ?, ?, ?, ?, ?)");
-            $success = $stmt->execute([$title, $description, $priority, $status, $reporter, $assignee]);
+            $stmt = $pdo->prepare("INSERT INTO bugs (title, description, priority, status, reporter_id)
+                                VALUES (?, ?, ?, ?, ?)");
+            $success = $stmt->execute([$title, $description, $priority, $status, $reporter]);
         } catch (PDOException $e) {
             $error = "Error: " . $e->getMessage(); // show error message
         }
-
-        // code for sending email to assignee
-        try {
-                $stmt_1 = $pdo->prepare("SELECT * FROM users WHERE id=?");
-                $stmt_1->execute([$assignee]);
-                $assigned_user = $stmt_1->fetch();
-                $assigned_user_email = $assigned_user['email'];
-                $devEmail=$assigned_user['email'];
-                $devName=$assigned_user['name'];
-                $assigned_by=$_SESSION['name'];
-
-                $mail = new PHPMailer(true);
-                $mail->isSMTP();
-
-                $mail->isSMTP();
-                $mail->Host = 'live.smtp.mailtrap.io';     
-                $mail->SMTPAuth = true;
-                $mail->Username = 'api'; 
-                $mail->Password = '0ec71dc97bc8f143d4f205251eb87f74';       
-                $mail->SMTPSecure = 'tls';
-                $mail->Port = 587;
-
-                // Sender & recipient
-                $mail->setFrom('jiralitebot@pranavtitambe.in', 'JiraLite Bot');
-                $mail->addAddress($devEmail, $devName);
-
-                // Email content
-                $mail->isHTML(true);
-                $mail->Subject = 'New Bug Assigned to You';
-                $mail->Body = "
-                    <h3>Hello $devName,</h3>
-                    <p>A new bug has been assigned to you by <strong>$assigned_by</strong>.</p>
-                    <p><strong>Title:</strong> $title</p>
-                    <p><strong>Description:</strong> $description</p>
-                    <p><strong>Severity:</strong> $priority</p>
-                    <p><strong>Status:</strong> $status</p>
-                    <br>
-                    <p>Please log in to JiraLite to manage the task.</p>
-                ";
-
-                $mail->send();
-                $success .= " Email sent to $devEmail.";
-        } catch (PDOException $e) {
-            $error = "Error: " . $e->getMessage();
-        }
+        
     } else {
         $error = "All fields are required.";
     }
@@ -212,7 +169,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       <option value="done">Done</option>
     </select>
 
-    <label for="assignTo">Assign To</label>
+    <!-- <label for="assignTo">Assign To</label>
     <select name="assignee" id="assignee">
         <option value="">-- Select Developer --</option>
         <?php
@@ -220,7 +177,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo'<option value="'.htmlspecialchars($dev['id']) . '">' .htmlspecialchars($dev['name']).'</option>';
         }
         ?>
-    </select>
+    </select> -->
     
 
     <button type="submit">Submit Bug</button>

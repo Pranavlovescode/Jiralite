@@ -76,9 +76,6 @@ header {
     padding: 1rem 0;
 }
 
-.bug-item:last-child {
-    border-bottom: 1px solid #0056b3;
-}
 
 .bug-title {
     font-size: 1.2rem;
