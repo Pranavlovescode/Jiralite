@@ -6,7 +6,7 @@ $pdo = createConnection();
 
 $error = '';
 
-if ((!isset($_SESSION['user_id']) && isset($_COOKIE['remember_token']) )|| (isset($_SESSION['user_id']) && isset($_COOKIE['remember_token']))) {
+if ((!isset($_SESSION['user_id']) && isset($_COOKIE['remember_token'])) || (isset($_SESSION['user_id']) && isset($_COOKIE['remember_token']))) {
     $token = $_COOKIE['remember_token'];
     $stmt = $pdo->prepare("SELECT * FROM users WHERE remember_token = ?");
     $stmt->execute([$token]);
@@ -22,27 +22,26 @@ if ((!isset($_SESSION['user_id']) && isset($_COOKIE['remember_token']) )|| (isse
     }
 }
 
-if($_SERVER['REQUEST_METHOD'] === 'POST'){
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email']);
     $pass = $_POST['password'];
     $remember = $_POST['remember'];
-    
-    if(!$email || !$pass){
+
+    if (!$email || !$pass) {
         $error = '❌ Email and password are required.';
-    }
-    else{
+    } else {
         $stmt = $pdo->prepare("select * from users where email=?");
         $stmt->execute([$email]);
         $user = $stmt->fetch();
 
-        if($user && password_verify($pass,$user['password'])){
+        if ($user && password_verify($pass, $user['password'])) {
             // valid login
             $_SESSION['user_id'] = $user['id'];
-            $_SESSION['name']=$user['name'];
-            $_SESSION['role']=$user['role'];
-            $_SESSION['email']=$user['email'];
+            $_SESSION['name'] = $user['name'];
+            $_SESSION['role'] = $user['role'];
+            $_SESSION['email'] = $user['email'];
 
-            if(!empty($remember)){
+            if (!empty($remember)) {
                 $token = bin2hex(random_bytes(32));
                 $stmt = $pdo->prepare("UPDATE users SET remember_token = ? WHERE id = ?");
                 $stmt->execute([$token, $user['id']]);
@@ -52,7 +51,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
             header("Location: dashboard.php");
             exit;
-        }else{
+        } else {
             $error = '❌ Invalid email or password.';
         }
     }
@@ -65,12 +64,14 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="static/login.css">
     <title>JiraLite</title>
 </head>
+
 <body>
     <div class='card'>
         <p class="title">Login to JiraLite</p>
@@ -103,4 +104,5 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         </form>
     </div>
 </body>
-</html> 
+
+</html>
