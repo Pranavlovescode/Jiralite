@@ -14,6 +14,7 @@ $pdo = createConnection();
 $stmt = $pdo->prepare("SELECT * FROM bugs WHERE assignee_id=?");
 $stmt->execute([$_SESSION['user_id']]);
 $bugs = $stmt->fetchAll();
+echo $bugs[0];
 
 $todo_bugs = array_filter($bugs, function ($bug) {
   return $bug['status'] === 'todo';
@@ -50,6 +51,8 @@ $username = $_SESSION['name'];
     <h2>🐞 JiraLite</h2>
     <a href="logout.php">Logout</a>
   </header>
+
+  <!-- <?php echo count($bugs) ?> -->
 
   <div class="container">
     <?php if ($_SESSION['role'] === 'admin'): ?>

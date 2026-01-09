@@ -48,18 +48,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['assignee'])) {
             $devName = $assigned_user['name'];
             $assigned_by = $_SESSION['name'];
 
-            // 4. Send email
+            // 4. Send email (Optional - won't block if it fails)
             try {
                 $mail = new PHPMailer(true);
                 $mail->isSMTP();
-                $mail->Host = 'live.smtp.mailtrap.io';
+                $mail->Host = 'smtp.mailgun.org';
                 $mail->SMTPAuth = true;
-                $mail->Username = 'api';
-                $mail->Password = '0ec71dc97bc8f143d4f205251eb87f74';
-                $mail->SMTPSecure = 'tls';
-                $mail->Port = 587;
-
-                $mail->setFrom('noreply@pranavtitambe.in', 'JiraLite');
+                $mail->Username = 'admin@pranavtitambe.in';
+                $mail->Password = '263b83ef9a738273585d27418eeac839-f6d80573-072526d9';
+                $mail->SMTPSecure = 'ssl';
+                $mail->Port = 465;
+                $mail->Timeout = 5; // 5 second timeout
+                
+                $mail->setFrom('admin@pranavtitambe.in', 'JiraLite Bug Tracker');
                 $mail->addAddress($devEmail, $devName);
 
                 $mail->isHTML(true);
@@ -75,10 +76,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['assignee'])) {
                     <p>Please log in to JiraLite to manage the task.</p>
                 ";
 
-                $mail->send();
-                $success .= "Email sent to $devEmail.<br>";
+                // Send email (won't block page if it fails)
+                if ($mail->send()) {
+                    // Email sent successfully
+
+                }
             } catch (Exception $e) {
-                $error .= "Mailer Error for $devEmail: {$mail->ErrorInfo}<br>";
+                // Log error but don't show it - just continue
+                error_log("Email failed for $devEmail: " . $e->getMessage());
             }
         }
     }
