@@ -1,8 +1,8 @@
 <?php
 function createConnection(): PDO
 {
-    $username = "pranav";
-    $pass = "pranav";
+    $username = "deilsy";
+    $pass = "12345678";
     $dbname = "jiralite";
 
     try {

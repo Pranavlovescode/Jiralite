@@ -27,13 +27,14 @@ $bugs = $stmt->fetchAll();
 
 <head>
   <meta charset="UTF-8" />
-  <title>JiraLite Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kanban Board | JiraLite</title>
   <link rel="stylesheet" href="static/kanban.css">
-  <script src="script.js"></script>
+</head>
 
 <body>
   <header>
-    <h1>🐞 JiraLite</h1>
+    <h1>🐞 JiraLite Kanban Board</h1>
     <nav>
       <a href="dashboard.php">Dashboard</a>
       <a href="report_bug.php">Report Bug</a>
@@ -45,31 +46,28 @@ $bugs = $stmt->fetchAll();
     <section class="kanban">
       <?php
       $statuses = [
-        'todo' => 'To Do',
-        'in_progress' => 'In Progress',
-        'done' => 'Done'
-      ];
-      $colors = [
-        'todo' => 'red',
-        'in_progress' => 'orange',
-        'done' => 'green'
+        'todo' => '📋 To Do',
+        'in_progress' => '🔄 In Progress',
+        'done' => '✅ Done'
       ];
       foreach ($statuses as $statusKey => $statusLabel): ?>
         <div class="column" id="<?= $statusKey ?>" ondragover="allowDrop(event)"
           ondrop="drop(event, '<?= $statusKey ?>')">
-          <h2 style="color:<?= $colors[$statusKey] ?>;"><?= $statusLabel ?></h2>
-          <?php foreach ($bugs as $bug): ?>
-            <?php if ($bug['status'] === $statusKey): ?>
-              <div class="card" draggable="true" ondragstart="drag(event)" data-id="<?= $bug['id'] ?>">
-                <?= htmlspecialchars($bug['title']) ?>
-              </div>
-            <?php endif; ?>
-          <?php endforeach; ?>
+          <h2><?= $statusLabel ?></h2>
+          <div class="cards-container">
+            <?php foreach ($bugs as $bug): ?>
+              <?php if ($bug['status'] === $statusKey): ?>
+                <div class="card" draggable="true" ondragstart="drag(event)" data-id="<?= $bug['id'] ?>" title="<?= htmlspecialchars($bug['description']) ?>">
+                  <span class="priority-badge priority-<?= htmlspecialchars($bug['priority']) ?>"></span>
+                  <?= htmlspecialchars($bug['title']) ?>
+                </div>
+              <?php endif; ?>
+            <?php endforeach; ?>
+          </div>
         </div>
       <?php endforeach; ?>
     </section>
   </main>
-
 
   <script>
     let draggedCard = null;
@@ -80,6 +78,7 @@ $bugs = $stmt->fetchAll();
 
     function drag(event) {
       draggedCard = event.target;
+      event.target.classList.add('dragging');
     }
 
     function drop(event, newStatus) {
@@ -87,10 +86,10 @@ $bugs = $stmt->fetchAll();
       if (!draggedCard) return;
 
       const bugId = draggedCard.dataset.id;
-
-      // Move card in DOM
       const column = document.getElementById(newStatus);
-      column.appendChild(draggedCard);
+      const cardsContainer = column.querySelector('.cards-container');
+      cardsContainer.appendChild(draggedCard);
+      draggedCard.classList.remove('dragging');
 
       // Send AJAX request to update status
       const xhr = new XMLHttpRequest();
@@ -100,14 +99,24 @@ $bugs = $stmt->fetchAll();
 
       xhr.onload = function () {
         if (xhr.status === 200) {
-          console.log("Status updated successfully.");
+          console.log("✅ Status updated successfully.");
         } else {
-          alert("Error updating bug status.");
+          alert("❌ Error updating bug status.");
+          location.reload();
         }
       };
-    }
-  </script>
 
+      draggedCard = null;
+    }
+
+    // Add visual feedback on drag end
+    document.addEventListener('dragend', () => {
+      draggedCard = null;
+      document.querySelectorAll('.card').forEach(card => {
+        card.classList.remove('dragging');
+      });
+    });
+  </script>
 
 </body>
 

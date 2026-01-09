@@ -56,11 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-
-
-
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -69,39 +65,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="static/login.css">
-    <title>JiraLite</title>
+    <title>JiraLite - Login</title>
 </head>
 
 <body>
     <div class='card'>
-        <p class="title">Login to JiraLite</p>
+        <p class="title">🐞 JiraLite</p>
+        <p style="text-align: center; color: #6b7280; font-size: 0.95rem; margin-bottom: 2rem;">Login to your account</p>
+        
         <?php if ($error): ?>
             <div class="errors"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
+
         <form action="index.php" method="post" class="login-form">
 
-            <div class="email">
-                <label for="email">Email</label>
-                <input type="email" name='email' placeholder="user@example.com">
+            <div>
+                <label for="email">Email Address</label>
+                <input type="email" name='email' id="email" placeholder="user@example.com" required>
             </div>
-            <div class="password">
-                <label for="pass">Password</label>
-                <input type="password" name="password" placeholder="********">
+
+            <div>
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" placeholder="••••••••" required>
             </div>
-            <span class="links">
-                <a href="#" class="forget-password">Forget Password?</a>
-                <a href="signup.php" class="signup">Signup</a>
-            </span>
 
             <div class="remember">
                 <label>
                     <input type="checkbox" name="remember" value="1">
-                    <p>Remember Me</p>
+                    <span>Remember me for 30 days</span>
                 </label>
             </div>
 
-            <button type="submit">Login</button>
+            <button type="submit">Login to JiraLite</button>
         </form>
+
+        <div class="links" style="margin-top: 1.5rem; border-top: 1px solid #e5e7eb; padding-top: 1.5rem;">
+            <a href="signup.php">Don't have an account? Sign up →</a>
+        </div>
     </div>
 </body>
 

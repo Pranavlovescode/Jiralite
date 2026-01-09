@@ -47,28 +47,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="static/login.css" />
   <title>JiraLite Signup</title>
-</head>
-<style>
-  .errors{
-    background-color: #f8d7da;
-      color: #a94442;
-      border: 1px solid #a94442;
-  }
-  .success{
-      margin-top: 1rem;
+  <style>
+    .errors {
+      background-color: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
       padding: 1rem;
-      background-color: #e1f5e1;
-      color: green;
-      border: 1px solid green;
-      border-radius: 5px;
-  }
-</style>
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .errors p {
+      margin: 0.5rem 0;
+    }
+
+    .errors p:first-child {
+      margin-top: 0;
+    }
+
+    .success {
+      background-color: #ecfdf5;
+      color: #059669;
+      border: 1px solid #a7f3d0;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .success a {
+      color: #3b82f6;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .success a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
 <body>
   <div class="card">
-    <p class="title">Welcome to JiraLite</p>
+    <p class="title">Welcome to JiraLite 🐞</p>
 
     <?php if ($success): ?>
-      <p class="success">✅ Signup successful! <a href="/jiralite/">Login</a></p>
+      <p class="success">✅ Signup successful! <a href="index.php">Login to your account →</a></p>
     <?php else: ?>
       <?php if (!empty($errors)): ?>
         <div class="errors">
@@ -81,34 +108,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <form method="post" action="signup.php" class="login-form">
         <div>
           <label for="name">Name</label>
-          <input type="text" name="name" id="name" placeholder="John Doe">
+          <input type="text" name="name" id="name" placeholder="John Doe" required>
         </div>
-        <div class="email">
-          <label for="email">Email</label>
-          <input type="email" name="email" placeholder="user@example.com">
-        </div>
-        <div class="password">
-          <label for="pass">Password</label>
-          <input type="password" name="password" placeholder="********" id="pass">
-        </div>
-        <div class="password">
-          <label for="confirm-pass">Confirm Password</label>
-          <input type="password" name="confirm-password" placeholder="********" id="confirm-pass">
-        </div>
+
         <div>
-          <label for="role">Roles</label>
-          <select name="role" id="role">
-            <option value="">Select option</option>
-            <option value="developer">Developer</option>
-            <option value="admin">Admin</option>
-            <option value="qa">Quality Assurance</option>
+          <label for="email">Email</label>
+          <input type="email" name="email" placeholder="user@example.com" required>
+        </div>
+
+        <div>
+          <label for="password">Password</label>
+          <input type="password" name="password" placeholder="At least 8 characters" id="password" required>
+        </div>
+
+        <div>
+          <label for="confirm-password">Confirm Password</label>
+          <input type="password" name="confirm-password" placeholder="Re-enter your password" id="confirm-password" required>
+        </div>
+
+        <div>
+          <label for="role">Select Your Role</label>
+          <select name="role" id="role" required>
+            <option value="">-- Choose a role --</option>
+            <option value="developer">👨‍💻 Developer</option>
+            <option value="qa">🧪 QA Tester</option>
+            <option value="admin">⚙️ Admin</option>
           </select>
         </div>
 
+        <button type="submit">Create Account</button>
+
         <div class="links">
-          <a href="/jiralite/" class="signup">Login</a>
+          <a href="index.php" class="signup">Already have an account? Login →</a>
         </div>
-        <button type="submit">Signup</button>
       </form>
     <?php endif; ?>
   </div>
